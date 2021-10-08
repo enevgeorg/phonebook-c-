@@ -1,0 +1,281 @@
+#include <iostream>
+#include <string>
+#include <fstream>
+
+using namespace std;
+
+const char* phonebook_filename = "phone_book.txt";
+
+
+struct contact_info
+{
+	string phone_number;
+	string contact_name;
+
+	contact_info* next_element = NULL;
+};
+
+contact_info* phonebook = NULL;
+
+unsigned int N_entries = 0;
+
+contact_info* look_up[26] = { NULL };
+void upcase(string&);
+contact_info* create_entry();
+void contact_insert(contact_info*);
+contact_info* contact_find(string);
+void contact_show(contact_info);
+void contact_find_show_delete();
+void contact_find_show();
+void phonebook_save();
+void phonebook_load();
+void showallcontacts();
+
+int main()
+{
+
+	phonebook_load();
+
+	char userchoice;
+	do
+	{
+		cout << endl;
+		cout << "a. Dobavi nov kontakt." << endl;
+		cout << "b. Iztrii kontakt." << endl;
+		cout << "c. Nameri kontakt i go pokaji. " << endl;
+		cout << "d. Zapazi vsichko vuvedeno do sega. " << endl;
+		cout << "e.Za da izleznete ot programat vuvedi dumata :exit . " << endl;
+		cout << "g.Pokaji vsichki kontakti ,koito sa zapazeni na FILE  . " << endl;
+		cout << endl << "Vuvedi tvoqt izbor: ";
+		cin >> userchoice;
+		switch (userchoice)
+		{
+		case 'a': case 'A':
+			contact_insert(create_entry());
+			break;
+			system("cls");
+		case 'b': case 'B':
+			contact_find_show_delete();
+			break;
+			system("cls");
+		case 'c': case 'C':
+			contact_find_show();
+			break;
+			system("cls");
+		case 'd': case 'D': case 'e': case 'E':
+			phonebook_save();
+
+			break;
+			system("cls");
+		case 'g': case 'G':
+			showallcontacts();
+			break;
+			system("cls");
+		default:
+			cout << endl << "!!!!!!!!! NEVALIDEN IZBOR !!!!!!!!" << endl;
+
+		}
+	} while ((userchoice != 'exit') && (userchoice != 'EXIT'));
+	cout << "Izlizane ot programa..." << endl;
+	return 0;
+	system("cls");
+}
+
+void upcase(string& str)
+{
+	for (int i = 0; i < str.length(); i++) str[i] = toupper(str[i]);
+}
+
+contact_info* create_entry()
+{
+	string novzapis;
+	contact_info* contact = phonebook;
+	contact_info* new_entry = new contact_info;
+	cout << "Molq vuvedi ime na kontakta:: ";
+	cin.ignore();
+	getline(cin, new_entry->contact_name);
+	upcase(new_entry->contact_name);
+	cout << "Molq vuvedi telefonniq nomer na kontakta: ";
+	getline(cin, new_entry->phone_number);
+	upcase(new_entry->phone_number);
+	new_entry->next_element = NULL;
+	cout << "Kontakta e dobaven" << endl;
+	return new_entry;
+}
+
+void contact_insert(contact_info* newcontact)
+{
+	// If the new item is the 1st item, we have special case
+	if (N_entries == 0 || phonebook->contact_name.compare(newcontact->contact_name) > 0)
+	{
+		newcontact->next_element = phonebook;
+		phonebook = newcontact;
+	}
+	else
+	{
+		contact_info* contact = phonebook;
+		while (contact != NULL)
+		{
+			if (newcontact->contact_name.compare(contact->contact_name) == 0)
+			{
+
+				cout << "No, ne beshe zapazen v sistemata ,zashtoto veche sushtestvuva takuv sus sushtoto ime!Molya vuvedi nov s razlichno ime!" << endl;
+				return;
+
+				break;
+
+			}
+			else
+				contact = contact->next_element;
+
+		}
+		contact_info* previous = phonebook;
+		contact_info* next = phonebook->next_element;
+		while (next != NULL)
+		{
+			if (newcontact->contact_name.compare(next->contact_name) < 0) break;
+			previous = next;
+			next = next->next_element;
+
+		}
+		previous->next_element = newcontact;
+		newcontact->next_element = next;
+
+	}
+	N_entries++;
+}
+
+
+
+contact_info* contact_find(string Name)
+{
+
+	contact_info* contact = phonebook;
+	while (contact != NULL)
+	{
+		if (Name.compare(contact->contact_name) == 0)
+			return contact;
+		else
+			contact = contact->next_element;
+	}
+	return NULL;
+}
+
+void contact_show(contact_info* contact)
+{
+	cout << "Ime na kontakta: " << contact->contact_name << endl;
+	cout << "Nomer na kontakta: " << contact->phone_number << endl;
+
+}
+
+void contact_find_show_delete()
+{
+	cout << "Molya vuvedi ime na kontakt ,koito iskate da iztriete: ";
+	string Name;
+	cin.ignore();
+	getline(cin, Name);
+	upcase(Name);
+	cout << endl;
+	contact_info* contact = contact_find(Name);
+	if (contact != NULL)
+	{
+		cout << "Shte iztriem sledniq kontakt:" << endl;
+		contact_show(contact);
+		cout << "Natisni 1 ako si suglasen:";
+		char confirm;
+		cin >> confirm;
+		if (confirm == '1' || confirm == '1')
+		{
+			if (contact == phonebook)
+			{
+				phonebook = phonebook->next_element;
+			}
+			else
+			{
+				contact_info* previous = phonebook;
+				while (previous->next_element != contact) previous = previous->next_element;
+				previous->next_element = contact->next_element;
+			}
+			delete contact;
+			N_entries--;
+			cout << "Kontakta uspeshno iztrit" << endl;
+		}
+		else cout << "Ne se iztri kontakta" << endl;
+	}
+	else cout << "Ne beshe nameren kontakta s ime " << Name << " v ukazatelq !!!" << endl;
+}
+
+void contact_find_show()
+{
+	cout << "Molq vuvedete kontakt koito iskate da potursite: ";
+	string Name;
+	cin.ignore();
+	getline(cin, Name);
+	cout << endl;
+	upcase(Name);
+	contact_info* contact = contact_find(Name);
+	if (contact != NULL)
+		contact_show(contact);
+	else
+		cout << "Ne beshe nameren " << Name << " v ukazatelq!!!" << endl;
+}
+
+void phonebook_save()
+{
+	ofstream phonebook_file;
+	phonebook_file.open(phonebook_filename);
+	cout << "Zapisvane na  " << N_entries << " na broi kontakti  " << phonebook_filename << " ..." << endl;
+	phonebook_file << N_entries << endl;
+	contact_info* current_item = phonebook;
+	while (current_item != NULL)
+	{
+		phonebook_file << "********************" << endl;
+		phonebook_file << current_item->contact_name << endl;
+		phonebook_file << current_item->phone_number << endl;
+		current_item = current_item->next_element;
+	}
+	phonebook_file.close();
+}
+void showallcontacts()
+{
+	ifstream phonebook_file(phonebook_filename);
+	string getcontent;
+	while (phonebook_file >> getcontent) {
+
+		
+		cout << getcontent << endl;
+
+	}
+	phonebook_file.close();
+}
+void phonebook_load()
+{
+	ifstream phonebook_file;
+	phonebook_file.open(phonebook_filename);
+	if (!phonebook_file.is_open())
+	{
+		cout << "Failat ne moje da bude otvoren,zashtoto ne seshtestvuva v direktoriata !!!" << endl;
+	}
+	else
+	{
+		phonebook_file >> N_entries;
+		contact_info** previous = &phonebook;
+		string text;
+
+		getline(phonebook_file, text);
+		cout << "Procheteni sa  " << N_entries << " na broi kontakti..." << endl;
+		for (int i = 0; i < N_entries; i++)
+		{
+			contact_info* new_entry = new contact_info;
+
+			getline(phonebook_file, text);
+			getline(phonebook_file, new_entry->contact_name);
+			getline(phonebook_file, new_entry->phone_number);
+			
+			new_entry->next_element = NULL;
+			*previous = new_entry;
+			previous = &new_entry->next_element;
+		}
+		phonebook_file.close();
+	}
+}
