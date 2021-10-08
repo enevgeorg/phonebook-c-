@@ -20,33 +20,33 @@ contact_info* phonebook = NULL;
 unsigned int N_entries = 0;
 
 contact_info* look_up[26] = { NULL };
-void upcase(string&);
-contact_info* create_entry();
-void contact_insert(contact_info*);
-contact_info* contact_find(string);
-void contact_show(contact_info);
-void contact_find_show_delete();
-void contact_find_show();
-void phonebook_save();
-void phonebook_load();
-void showallcontacts();
+void upcase(string&);                      //function prototype which would convert an string to uppercase
+contact_info* create_entry();              //function prototype which gets the input from user and stores in into a new contact object.
+void contact_insert(contact_info*);        //function prototype which inserts the new contact object into the phonebook
+contact_info* contact_find(string);        //function prototype to search and find a contact object based on Name
+void contact_show(contact_info);           //function prototype to show the information of a contact objecy
+void contact_find_show_delete();           //function prototype to find and delete contacts 
+void contact_find_show();                  //function prototype to find and show a Name in phonebook (plus some Error handling)
+void phonebook_save();                     //function prototype to store data into file 
+void phonebook_load();                     //function prototype to load the data file 
+void showallcontacts();                    //function prototype to show all contacts on terminal
 
 int main()
 {
-
+        //After running the program, it must enter an infinity loop which provides the below menu
 	phonebook_load();
 
 	char userchoice;
 	do
 	{
 		cout << endl;
-		cout << "a. Dobavi nov kontakt." << endl;
-		cout << "b. Iztrii kontakt." << endl;
-		cout << "c. Nameri kontakt i go pokaji. " << endl;
-		cout << "d. Zapazi vsichko vuvedeno do sega. " << endl;
-		cout << "e.Za da izleznete ot programat vuvedi dumata :exit . " << endl;
-		cout << "g.Pokaji vsichki kontakti ,koito sa zapazeni na FILE  . " << endl;
-		cout << endl << "Vuvedi tvoqt izbor: ";
+		cout << "a. Add new contact." << endl;
+		cout << "b. Delete contact." << endl;
+		cout << "c. Find a contact and show it. " << endl;
+		cout << "d. Save every contact entered by now. " << endl;
+		cout << "e.To exit write "exit" . " << endl;
+		cout << "g.Show every contact that is saved on File . " << endl;
+		cout << endl << "Enter your choice: ";
 		cin >> userchoice;
 		switch (userchoice)
 		{
@@ -72,11 +72,11 @@ int main()
 			break;
 			system("cls");
 		default:
-			cout << endl << "!!!!!!!!! NEVALIDEN IZBOR !!!!!!!!" << endl;
+			cout << endl << "!!!!!!!!! Invalid input !!!!!!!!" << endl;
 
 		}
 	} while ((userchoice != 'exit') && (userchoice != 'EXIT'));
-	cout << "Izlizane ot programa..." << endl;
+	cout << "Exiting program..." << endl;
 	return 0;
 	system("cls");
 }
@@ -91,15 +91,15 @@ contact_info* create_entry()
 	string novzapis;
 	contact_info* contact = phonebook;
 	contact_info* new_entry = new contact_info;
-	cout << "Molq vuvedi ime na kontakta:: ";
-	cin.ignore();
+	cout << "Please enter contacts name:: ";
+	cin.ignore();                               //clearing input buffer to use getline function
 	getline(cin, new_entry->contact_name);
 	upcase(new_entry->contact_name);
-	cout << "Molq vuvedi telefonniq nomer na kontakta: ";
+	cout << "Please enter phone number of contact: ";
 	getline(cin, new_entry->phone_number);
 	upcase(new_entry->phone_number);
 	new_entry->next_element = NULL;
-	cout << "Kontakta e dobaven" << endl;
+	cout << "Contact successfully entered" << endl;
 	return new_entry;
 }
 
@@ -119,7 +119,7 @@ void contact_insert(contact_info* newcontact)
 			if (newcontact->contact_name.compare(contact->contact_name) == 0)
 			{
 
-				cout << "No, ne beshe zapazen v sistemata ,zashtoto veche sushtestvuva takuv sus sushtoto ime!Molya vuvedi nov s razlichno ime!" << endl;
+				cout << "Contact wasnt saved because a contact with the same name exists!" << endl;
 				return;
 
 				break;
@@ -146,7 +146,7 @@ void contact_insert(contact_info* newcontact)
 }
 
 
-
+// Function searchs & returns the pointer to contact based on contact name (or NULL if not found).
 contact_info* contact_find(string Name)
 {
 
@@ -160,17 +160,17 @@ contact_info* contact_find(string Name)
 	}
 	return NULL;
 }
-
+//Function prints a contact information.
 void contact_show(contact_info* contact)
 {
 	cout << "Ime na kontakta: " << contact->contact_name << endl;
 	cout << "Nomer na kontakta: " << contact->phone_number << endl;
 
 }
-
+//Function does Finding, Showing, confirming and deleting a contact
 void contact_find_show_delete()
 {
-	cout << "Molya vuvedi ime na kontakt ,koito iskate da iztriete: ";
+	cout << "Enter a contact that you want to be deleted : ";
 	string Name;
 	cin.ignore();
 	getline(cin, Name);
@@ -179,9 +179,9 @@ void contact_find_show_delete()
 	contact_info* contact = contact_find(Name);
 	if (contact != NULL)
 	{
-		cout << "Shte iztriem sledniq kontakt:" << endl;
+		cout << "The following contact will be deleted:" << endl;
 		contact_show(contact);
-		cout << "Natisni 1 ako si suglasen:";
+		cout << "Press 1 ,if you agree to continue:";
 		char confirm;
 		cin >> confirm;
 		if (confirm == '1' || confirm == '1')
@@ -202,12 +202,12 @@ void contact_find_show_delete()
 		}
 		else cout << "Ne se iztri kontakta" << endl;
 	}
-	else cout << "Ne beshe nameren kontakta s ime " << Name << " v ukazatelq !!!" << endl;
+	else cout << "A contact with the name  " << Name << " wasnt found in the phonebook  !!!" << endl;
 }
-
+//This functions handels searching for a contact
 void contact_find_show()
 {
-	cout << "Molq vuvedete kontakt koito iskate da potursite: ";
+	cout << "Please enter a contact you want to search : ";
 	string Name;
 	cin.ignore();
 	getline(cin, Name);
@@ -217,14 +217,14 @@ void contact_find_show()
 	if (contact != NULL)
 		contact_show(contact);
 	else
-		cout << "Ne beshe nameren " << Name << " v ukazatelq!!!" << endl;
+		cout << "Contact with the name  " << Name << " wasnt found in the phonebook!!!" << endl;
 }
-
+//This function saves contacts
 void phonebook_save()
 {
 	ofstream phonebook_file;
 	phonebook_file.open(phonebook_filename);
-	cout << "Zapisvane na  " << N_entries << " na broi kontakti  " << phonebook_filename << " ..." << endl;
+	cout << "Saving  " << N_entries << " contacts  " << phonebook_filename << " ..." << endl;
 	phonebook_file << N_entries << endl;
 	contact_info* current_item = phonebook;
 	while (current_item != NULL)
@@ -236,6 +236,7 @@ void phonebook_save()
 	}
 	phonebook_file.close();
 }
+// This function displays all contacts on terminal screen 
 void showallcontacts()
 {
 	ifstream phonebook_file(phonebook_filename);
@@ -248,13 +249,14 @@ void showallcontacts()
 	}
 	phonebook_file.close();
 }
+// This function reads the default contact file
 void phonebook_load()
 {
 	ifstream phonebook_file;
 	phonebook_file.open(phonebook_filename);
 	if (!phonebook_file.is_open())
 	{
-		cout << "Failat ne moje da bude otvoren,zashtoto ne seshtestvuva v direktoriata !!!" << endl;
+		cout << "File could not be opend,because it doesnt exists !!!" << endl;
 	}
 	else
 	{
@@ -263,7 +265,7 @@ void phonebook_load()
 		string text;
 
 		getline(phonebook_file, text);
-		cout << "Procheteni sa  " << N_entries << " na broi kontakti..." << endl;
+		cout << "Foundgith " << N_entries << " contacts..." << endl;
 		for (int i = 0; i < N_entries; i++)
 		{
 			contact_info* new_entry = new contact_info;
